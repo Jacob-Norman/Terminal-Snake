@@ -1,12 +1,9 @@
 from random import randint
 from math import floor
 
-startSnake = [('j', 15),('j', 16), ('j', 17), ('j', 18), ('j', 19)]
-startApple = ('j', 5)
-
-def setSnake(newHead: tuple, addTail: bool, currentSnake: list[tuple] = startSnake):
+def setSnake(currentSnake: list[tuple], newHead: tuple, addTail: bool):
     newSnake: list[tuple] = []
-    snakePositions: set[tuple] = {}
+    snakePositions = set()
     bodyTemp = newHead
     for body in currentSnake:
         newSnake.append(bodyTemp)
@@ -29,5 +26,5 @@ def setApple(snake: list[tuple]):
     # potentialApple is now all the squares in index from without a snake in it
     appleIndex = potentialApple[randint(0, (len(potentialApple) - 1))]
     appleRow = chr((floor(appleIndex/24)) + 97)
-    appleCol = appleIndex - floor(appleIndex/24)
+    appleCol = appleIndex % 24 
     return (appleRow, appleCol)
