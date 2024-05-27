@@ -14,20 +14,24 @@ validCol = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
             15, 16, 17, 18, 19, 20, 21, 22, 23}
 
 # If this function is exited without the program terminating then the player is ready to play
-def startMenu():
+def startMenu(stdscr):
     response = ''
-    while response != "y" or response != "q":
-        board.printEmptyFrame()
+    while response != "p" or response != "q":
+        board.printEmptyFrame(stdscr)
+        stdscr.addstr(21, 0,"           Play [p]           Quit[q]\n")
+        stdscr.refresh()
         flush_input()
-        response = input("Are you ready to play? [y/n]: ")
-        response = response.lower()
-        if response == "y":
+        response = stdscr.getkey()
+        if response == "p":
+            stdscr.clear()
+            stdscr.refresh()
             break
         elif response == "q":
             exit()
         else:
-            print("Please enter either 'y' or 'q'")
-            sleep(1.5)
+            stdscr.addstr(22, 0, f"You entered {response}\nPlease enter either 'p' or 'q'")
+            stdscr.refresh()
+            sleep(2)
     return 0
 
 def moveSnake(currentHead: tuple, prevDir: str):
@@ -64,7 +68,7 @@ def moveSnake(currentHead: tuple, prevDir: str):
     
     return (newHead, newDir)
 
-def gameMain():
+def gameMain(stdscr):
     #starting values of the game
     snake: list[tuple] = [('j', 15),('j', 16), ('j', 17), ('j', 18), ('j', 19)]
     snakePosition: set[tuple] = {('j', 15),('j', 16), ('j', 17), ('j', 18), ('j', 19)}
@@ -92,24 +96,24 @@ def gameMain():
 
         #draw game
         frame = board.drawFrame(snakePosition, apple) 
-        board.printFrame(frame)
+        board.printFrame(stdscr, frame)
 
         #delay
         sleep(0.08)
 
-def gameOver():
-    status = ''
-    while status != 'r' or status != 'q':
-        board.printGameOver()
-        sleep(0.1)
+def gameOver(stdscr):
+    response = ''
+    while response != 'r' or response != 'q':
+        board.printGameOver(stdscr)
         flush_input()
-        status = input('Would you like to restart or quit? [r/q]: ')
-        if status == 'q':
+        response = stdscr.getkey()
+        if response == 'q':
             retry = False
             return retry
-        elif status == 'r':
+        elif response == 'r':
             retry = True
             return retry
         else:
-            print("Please type 'r' or 'q'.")
-            sleep(1.5)
+            stdscr.addstr(22, 0, f"You entered {response}\nPlease enter either 'p' or 'q'")
+            stdscr.refresh()
+            sleep(2)

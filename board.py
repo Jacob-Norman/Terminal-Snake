@@ -1,8 +1,9 @@
 import os
 
-def printFrame(frame: str):
-    os.system('cls' if os.name == 'nt' else 'clear')
-    print(frame)
+def printFrame(stdscr, frame: str):
+    stdscr.clear()
+    stdscr.addstr(0, 0, frame)
+    stdscr.refresh()
 
 # 19x24
 emptyFrame = '''
@@ -41,12 +42,14 @@ gameOverScreen = '''
 
 '''
 
-def printGameOver():
-    printFrame(gameOverScreen)
+def printGameOver(stdscr):
+    stdscr.clear()
+    printFrame(stdscr, gameOverScreen)
 
 
-def printEmptyFrame():
-    printFrame(emptyFrame)
+def printEmptyFrame(stdscr):
+    stdscr.clear()
+    printFrame(stdscr, emptyFrame)
 
 
 def drawFrame(snakePosition: set[tuple], apple: tuple, emptyFrame = emptyFrame):
@@ -68,7 +71,7 @@ def drawFrame(snakePosition: set[tuple], apple: tuple, emptyFrame = emptyFrame):
             # if statements in place of elif/else because if an apple and snake are in the same position
             # I want the snake to be printed over the apple.
             if (row, col) == apple:
-                newTile = "🟥"
+                newTile = "🍎"
                 isApple = True
             if (row, col) in snakePosition:
                 newTile = "🟩"
