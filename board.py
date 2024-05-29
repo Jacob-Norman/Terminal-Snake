@@ -1,5 +1,3 @@
-import os
-
 def printFrame(stdscr, frame: str):
     stdscr.clear()
     stdscr.addstr(0, 0, frame)
