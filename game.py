@@ -1,12 +1,14 @@
 import board
 import snakeApple as snapple
 from time import sleep
+from time import time
 import keyboard as keys
 import msvcrt
 
 def flush_input():
     while msvcrt.kbhit():
         msvcrt.getch()
+
 
 validRow = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's'}
@@ -34,19 +36,34 @@ def startMenu(stdscr):
             sleep(2)
     return 0
 
-def moveSnake(currentHead: tuple, prevDir: str):
+def getDir(delay: int):
+    start = time()
+    dir: str = ''
+    while((time() - start) < delay):
+        if keys.is_pressed('w') or keys.is_pressed("up"):
+            dir = "up"
+        elif keys.is_pressed('a') or keys.is_pressed("left"):
+            dir = "left"
+        elif keys.is_pressed('s') or keys.is_pressed("down"):
+            dir = "down"
+        elif keys.is_pressed('d') or keys.is_pressed("right"):
+            dir = "right"
+
+    return dir
+
+def moveSnake(currentHead: tuple, prevDir: str, input: str):
     newDir = str()
     oppDir = str()
-    if keys.is_pressed('w') or keys.is_pressed("up"):
+    if input == "up":
         newDir = "up"
         oppDir = "down"
-    elif keys.is_pressed('a') or keys.is_pressed("left"):
+    elif input == "left":
         newDir = "left"
         oppDir = "right"
-    elif keys.is_pressed('s') or keys.is_pressed("down"):
+    elif input == "down":
         newDir = "down"
         oppDir = "up"
-    elif keys.is_pressed('d') or keys.is_pressed("right"):
+    elif input == "right":
         newDir = "right"
         oppDir = "left"
     else:
@@ -76,13 +93,20 @@ def gameMain(stdscr):
     direction: str = "left"
     head: tuple = ('j', 15)
     ateApple: bool = False
+    inputDir: str = ''
+    score: int = 0
     while True:
+        # game delay is inside this function this ensure that even if the user presses a key
+        # within the delay of the game the input will still be accepted.
+        inputDir = getDir(0.1)
+
         #check for apple
         if apple in snakePosition:
             ateApple = True
+            score += 1
         
         #determine snake position
-        head, direction = moveSnake(head, direction)
+        head, direction = moveSnake(head, direction, inputDir)
         if head in snakePosition:
             break
         (snake, snakePosition) = snapple.setSnake(snake, head, ateApple)
@@ -97,14 +121,15 @@ def gameMain(stdscr):
         #draw game
         frame = board.drawFrame(snakePosition, apple) 
         board.printFrame(stdscr, frame)
+    
+    return score
 
-        #delay
-        sleep(0.08)
-
-def gameOver(stdscr):
+def gameOver(stdscr, score, highScore):
     response = ''
     while response != 'r' or response != 'q':
         board.printGameOver(stdscr)
+        stdscr.addstr(12, 0, f"               ========== Score: {score} ==========\n")
+        stdscr.addstr(13, 0, f"             ========== High Score: {highScore} ==========\n")
         flush_input()
         response = stdscr.getkey()
         if response == 'q':
@@ -114,6 +139,6 @@ def gameOver(stdscr):
             retry = True
             return retry
         else:
-            stdscr.addstr(22, 0, f"You entered {response}\nPlease enter either 'p' or 'q'")
+            stdscr.addstr(15, 0, f"You entered {response}\nPlease enter either 'r' or 'q'")
             stdscr.refresh()
             sleep(2)
